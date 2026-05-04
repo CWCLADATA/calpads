@@ -105,18 +105,18 @@ def main():
         ("ActiveStudent", False)
     ]
     extracts_map = {
-        "SENR": "SENR",
+        #"SENR": "SENR",
         "SELA": "SELA",
-        "SINF": "SINF",
-        "SWDS": "SWDS",
-        "SPRG": "SPRG",
+        #"SINF": "SINF",
+        #"SWDS": "SWDS",
+        #"SPRG": "SPRG",
         "DIRECTCERTIFICATION": "DirectCert",
     }
     report_urls_map = {
-        "Accountability/16_21_StudentswithDisabilities_OverduePlanReviewandReevaluationMeetingsStudentList": "16.21",
-        "Accountability/16_14_StudentswithDisabilitiesPlanStudentListbyDSEA": "16.14",
-        "Realtime/5_7_FosterYouthEnrolledStudentListrt": "5.7",
-        "Realtime/5_9_FormerFosterYouthEnrolledStudentListrt": "5.9",
+        #"Accountability/16_21_StudentswithDisabilities_OverduePlanReviewandReevaluationMeetingsStudentList": "16.21",
+        #"Accountability/16_14_StudentswithDisabilitiesPlanStudentListbyDSEA": "16.14",
+        #"Realtime/5_7_FosterYouthEnrolledStudentListrt": "5.7",
+        #"Realtime/5_9_FormerFosterYouthEnrolledStudentListrt": "5.9",
     }
     lea_map = {
         "0126193": "MV",
@@ -222,7 +222,7 @@ def main():
                 time.sleep(10)
                 gmailpage.reload()
                 
-            gmailpage.wait_for_timeout(2000)
+            gmailpage.wait_for_timeout(4000)
             new_message_banner = gmailpage.locator("text=/new message|new messages/i")
 
             if new_message_banner.count() > 0:
