@@ -105,12 +105,12 @@ def main():
         ("ActiveStudent", False)
     ]
     extracts_map = {
-        #"SENR": "SENR",
+        "SENR": "SENR",
         "SELA": "SELA",
         #"SINF": "SINF",
-        #"SWDS": "SWDS",
+        "SWDS": "SWDS",
         #"SPRG": "SPRG",
-        "DIRECTCERTIFICATION": "DirectCert",
+        #"DIRECTCERTIFICATION": "DirectCert",
     }
     report_urls_map = {
         #"Accountability/16_21_StudentswithDisabilities_OverduePlanReviewandReevaluationMeetingsStudentList": "16.21",
