@@ -48,7 +48,7 @@ def build_authenticated_session_via_playwright():
             path=cookie.get("path", "/"),
         )
 
-    return session, gmailpage
+    return session, gmailpage, calpadspage
 def enable_http_debug(session):
     original_get = session.get
     original_post = session.post
@@ -100,16 +100,22 @@ def main():
         ("SpecialEducationStatus", "2"),
         ("SpecialEducationStatus", "3"),
         ("SpecialEducationStatus", "4"),
+        ("spedStatus", "1"),
+        ("spedStatus", "2"),
+        ("spedStatus", "3"),
+        ("spedStatus", "4"),
         ("CertificationStatusCode", "All"),
         ("EducationProgramCode", "All"),
         ("ActiveStudent", False)
     ]
     extracts_map = {
-        "SENR": "SENR",
-        "SELA": "SELA",
+        #"SENR": "SENR",
+        #"SELA": "SELA",
         #"SINF": "SINF",
-        "SWDS": "SWDS",
+        #"SWDS": "SWDS",
         #"SPRG": "SPRG",
+        #"PLAN": "PLAN",
+        "SERV": "SERV",
         #"DIRECTCERTIFICATION": "DirectCert",
     }
     report_urls_map = {
@@ -125,15 +131,22 @@ def main():
         "0139832": "WV",
         "0126177": "SL"
     }
+    lea_orgselect_map = {
+        "MV": "26896",
+        "HW": "26378",
+        "EV": "33465",
+        "WV": "32922",
+        "SL": "26913"
+    }
     lea_schoolname_map = {
-        "MV": "Mar Vista",
-        "HW": "Hollywood",
         "EV": "East Valley",
+        "HW": "Hollywood",
+        "MV": "Mar Vista",
         "WV": "West Valley",
         "SL": "Silver Lake"
     }
     
-    session, gmailpage  = build_authenticated_session_via_playwright()
+    session, gmailpage, calpadspage  = build_authenticated_session_via_playwright()
     cc = CALPADSClient(session=session)
     enable_http_debug(cc.session)
 
@@ -142,29 +155,51 @@ def main():
         for lea_code, abbrev in lea_map.items():
             
             schoolname = lea_schoolname_map.get(abbrev)
+            orgcode = lea_orgselect_map.get(abbrev)
 
             try:
                 print("=================================================")
                 print(f"Downloading {report} for {abbrev} {schoolname}")
 
-                request_ok = cc.download_report(
-                    lea_code=lea_code,
-                    form_data=
-                    {
-                        "LEA": f"Citizens of the World Charter School {schoolname}",
-                        "School": {f"Citizens of the World Charter School {schoolname}-{lea_code}":True},
-                        "AsOfMonth": datetime.today().strftime("%B"),
-                        "AsOfDay": str(datetime.today().day)
-                    }
-                    ,
-                    report_code=report,
-                    file_name=Path(dest_dir) / "Reports" / f"{abbrev} - {report}.csv",
-                    url_override=f"https://www.calpads.org/Report/{report_url}"
-                )
+                if report=="16.14" or report=="16.21":
 
-                if not request_ok:
-                    print(f"Request may have failed for {report} / {abbrev}")
-                    continue
+                    calpadspage.get_by_label("Citizens of the World Charter").select_option(orgcode)
+                    time.sleep(2)
+                    calpadspage.goto(f"https://www.calpads.org/Report/{report_url}")
+                    time.sleep(4)
+                    calpadspage.frame_locator("#reports iframe").locator("input[value='View Report']").evaluate("el => el.click()")
+                    time.sleep(6)
+                    calpadspage.frame_locator("#reports iframe").get_by_role("button", name="Export drop down menu").click()
+
+                    with calpadspage.expect_download() as download_info:
+                        calpadspage.frame_locator("#reports iframe").get_by_role("link", name="CSV (comma delimited)").click()
+
+                    download = download_info.value
+                    save_path = Path(dest_dir) / "Reports" / f"{abbrev} - {report}.csv"
+                    download.save_as(str(save_path))
+
+                    time.sleep(2)
+
+                else:
+                    request_ok = cc.download_report(
+                        dry_run=True,
+                        lea_code=lea_code,
+                        form_data=
+                        {
+                            "LEA": f"Citizens of the World Charter School {schoolname}",
+                            "School": {f"Citizens of the World Charter School {schoolname}-{lea_code}":True},
+                            "AsOfMonth": datetime.today().strftime("%B"),
+                            "AsOfDay": str(datetime.today().day)
+                        }
+                        ,
+                        report_code=report,
+                        file_name=Path(dest_dir) / "Reports" / f"{abbrev} - {report}.csv",
+                        url_override=f"https://www.calpads.org/Report/{report_url}"
+                    )
+
+                    if not request_ok:
+                        print(f"Request may have failed for {report} / {abbrev}")
+                        continue
 
             except Exception as e:
                 print(f"{report} failed for {abbrev}: {e}")
@@ -186,7 +221,7 @@ def main():
                     lea_code=lea_code,
                     extract_name=extract,
                     by_date_range=True,
-                    form_data=form_data,
+                    form_data=form_data
                 )
 
                 if not request_ok:
