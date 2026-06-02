@@ -87,6 +87,7 @@ def enable_http_debug(session):
 
     #session.get = debug_get
     session.post = debug_post
+    
 def main():
     extracts_base_input = [
         ("RecordHistory", "Y"),
@@ -112,10 +113,11 @@ def main():
         #"SENR": "SENR",
         #"SELA": "SELA",
         #"SINF": "SINF",
-        #"SWDS": "SWDS",
+        "SWDS": "SWDS",
         #"SPRG": "SPRG",
         #"PLAN": "PLAN",
-        "SERV": "SERV",
+        #"SERV": "SERV",
+        #"MEET" : "MEET",
         #"DIRECTCERTIFICATION": "DirectCert",
     }
     report_urls_map = {
