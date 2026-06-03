@@ -87,7 +87,7 @@ def enable_http_debug(session):
 
     #session.get = debug_get
     session.post = debug_post
-    
+
 def main():
     extracts_base_input = [
         ("RecordHistory", "Y"),
