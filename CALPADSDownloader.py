@@ -2,6 +2,7 @@ import logging
 import time
 import traceback
 import requests
+import subprocess
 import pandas as pd
 from google.cloud import bigquery
 from calpads.client import CALPADSClient
@@ -88,15 +89,24 @@ def enable_http_debug(session):
     #session.get = debug_get
     session.post = debug_post
 
+def run_prep_push():
+    subprocess.run(
+        [
+            "python",
+            Path("C:\Users\Administrator\calpads\Downloaders\PrepAndPush.py")
+        ],
+        check=True
+    )
+
 def main():
     extracts_base_input = [
         ("RecordHistory", "Y"),
         ("School", "0000001"),
         ("School", "0000002"),
-        ("StartDate", "07/01/2021"),
-        ("EnrollmentStartDate", "07/01/2021"),
-        ("EndDate", "06/30/2026"),
-        ("EnrollmentEndDate", "06/30/2026"),
+        ("StartDate", "07/01/2022"),
+        ("EnrollmentStartDate", "07/01/2022"),
+        ("EndDate", "06/30/2027"),
+        ("EnrollmentEndDate", "06/30/2027"),
         ("SpecialEducationStatus", "1"),
         ("SpecialEducationStatus", "2"),
         ("SpecialEducationStatus", "3"),
@@ -110,14 +120,14 @@ def main():
         ("ActiveStudent", False)
     ]
     extracts_map = {
-        #"SENR": "SENR",
-        #"SELA": "SELA",
+        "SENR": "SENR",
+        "SELA": "SELA",
         #"SINF": "SINF",
-        "SWDS": "SWDS",
+        #"SWDS": "SWDS",
         #"SPRG": "SPRG",
         #"PLAN": "PLAN",
         #"SERV": "SERV",
-        #"MEET" : "MEET",
+        #"MEET": "MEET",
         #"DIRECTCERTIFICATION": "DirectCert",
     }
     report_urls_map = {
@@ -279,6 +289,8 @@ def main():
 
             print("Saved to:", save_path)
     print(" Extracts done")
+    
+    run_prep_push()
     
     return "Done!"
 if __name__ == "__main__":
